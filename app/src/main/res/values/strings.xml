@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">RemotePicViewer</string>
+    <string name="title_picture_detail">Picture Detail</string>
+</resources>
