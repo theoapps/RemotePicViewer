@@ -9,6 +9,9 @@ import android.view.View;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
+import android.widget.ImageView;
+
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 /**
  * An activity representing a single Picture detail screen. This
@@ -18,21 +21,14 @@ import android.view.MenuItem;
  */
 public class PictureDetailActivity extends AppCompatActivity {
 
+    public static final String FLIKR_PHOTO = "flikrPhoto";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -52,14 +48,14 @@ public class PictureDetailActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putString(PictureDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(PictureDetailFragment.ARG_ITEM_ID));
-            PictureDetailFragment fragment = new PictureDetailFragment();
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.picture_detail_container, fragment)
-                    .commit();
+            Bundle b = getIntent().getExtras();
+            if(b != null) {
+                FlikrPhoto photo = b.getParcelable(FLIKR_PHOTO);
+                PictureDetailFragment fragment = new PictureDetailFragment(photo);
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.picture_detail_container, fragment)
+                        .commit();
+            }
         }
     }
 

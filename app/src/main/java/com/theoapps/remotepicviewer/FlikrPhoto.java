@@ -1,5 +1,7 @@
 package com.theoapps.remotepicviewer;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -12,7 +14,7 @@ import java.net.URL;
 /**
  * Created by theo on 1/16/16.
  */
-public class FlikrPhoto {
+public class FlikrPhoto implements Parcelable{
     String id;
     String server;
     String farm;
@@ -56,7 +58,36 @@ public class FlikrPhoto {
         return urlString;
     }
 
-    static void getData() {
-
+    @Override
+    public int describeContents() {
+        return 0;
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.id);
+        dest.writeString(this.server);
+        dest.writeString(this.farm);
+        dest.writeString(this.secret);
+    }
+
+    public FlikrPhoto() {
+    }
+
+    protected FlikrPhoto(Parcel in) {
+        this.id = in.readString();
+        this.server = in.readString();
+        this.farm = in.readString();
+        this.secret = in.readString();
+    }
+
+    public static final Creator<FlikrPhoto> CREATOR = new Creator<FlikrPhoto>() {
+        public FlikrPhoto createFromParcel(Parcel source) {
+            return new FlikrPhoto(source);
+        }
+
+        public FlikrPhoto[] newArray(int size) {
+            return new FlikrPhoto[size];
+        }
+    };
 }

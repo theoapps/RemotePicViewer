@@ -1,5 +1,7 @@
 package com.theoapps.remotepicviewer;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -77,8 +79,7 @@ public class PictureListActivity extends AppCompatActivity {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(photos));
     }
 
-    public class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+    public class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private final List<FlikrPhoto> mValues;
 
@@ -93,7 +94,7 @@ public class PictureListActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
+        public void onBindViewHolder(final ViewHolder holder, final int position) {
             holder.mItem = mValues.get(position);
             ImageLoader imageLoader = ImageLoader.getInstance();
             imageLoader.displayImage(mValues.get(position).getURI(), holder.mImageView);
@@ -101,21 +102,19 @@ public class PictureListActivity extends AppCompatActivity {
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    /*if (mTwoPane) {
-                        Bundle arguments = new Bundle();
-                        arguments.putString(PictureDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-                        PictureDetailFragment fragment = new PictureDetailFragment();
-                        fragment.setArguments(arguments);
+                    if (mTwoPane) {
+                        PictureDetailFragment fragment = new PictureDetailFragment(mValues.get(position));
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.picture_detail_container, fragment)
                                 .commit();
                     } else {
                         Context context = v.getContext();
+                        Bundle bundle = new Bundle();
                         Intent intent = new Intent(context, PictureDetailActivity.class);
-                        intent.putExtra(PictureDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-
+                        bundle.putParcelable(PictureDetailActivity.FLIKR_PHOTO, mValues.get(position));
+                        intent.putExtras(bundle);
                         context.startActivity(intent);
-                    }*/
+                    }
                 }
             });
         }

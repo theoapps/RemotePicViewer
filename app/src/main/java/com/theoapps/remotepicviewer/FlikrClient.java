@@ -24,7 +24,7 @@ public class FlikrClient extends AsyncTask {
     protected Object doInBackground(Object[] params) {
         List<FlikrPhoto> flikrPhotos = new ArrayList<FlikrPhoto>();
         try {
-            URL url = new URL("https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=f1aabefff34953a00979a416dd232bbb&tags=vaporwave&per_page=5&page=1&format=json&nojsoncallback=1");
+            URL url = new URL("https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=f1aabefff34953a00979a416dd232bbb&tags=farm&per_page=20&page=1&format=json&nojsoncallback=1");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             int responseCode = conn.getResponseCode();
             if(responseCode == HttpURLConnection.HTTP_OK) {
