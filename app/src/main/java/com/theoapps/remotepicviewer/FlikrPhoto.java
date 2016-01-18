@@ -50,9 +50,9 @@ public class FlikrPhoto {
         this.secret = secret;
     }
 
-    public String getUrlString(FlikrPhoto pic) {
+    public String getURI() {
         //https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
-        String urlString = "https://farm" + pic.farm + ".staticflickr.com/"+ pic.server +"/"+ pic.id +"_"+ pic.secret +".jpg";
+        String urlString = "https://farm" + farm + ".staticflickr.com/"+ server +"/"+ id +"_"+ secret +".jpg";
         return urlString;
     }
 

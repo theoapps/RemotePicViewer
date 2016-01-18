@@ -1,24 +1,21 @@
 package com.theoapps.remotepicviewer;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 
-import com.theoapps.remotepicviewer.dummy.DummyContent;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,10 +43,6 @@ public class PictureListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        View recyclerView = findViewById(R.id.picture_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
-
         if (findViewById(R.id.picture_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -58,46 +51,57 @@ public class PictureListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
+
+        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .build();
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
+                .defaultDisplayImageOptions(defaultOptions)
+                .build();
+        ImageLoader.getInstance().init(config);
+
         FlikrClient fc = new FlikrClient();
         try {
             List<FlikrPhoto> photos = (List<FlikrPhoto>) fc.execute().get();
             Log.d("PictureList", String.valueOf(photos.size()));
+            View recyclerView = findViewById(R.id.picture_list);
+            assert recyclerView != null;
+            setupRecyclerView((RecyclerView) recyclerView, photos);
         }
         catch(Exception e) {
             Log.d("PictureList", "exception " + e);
         }
     }
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+    private void setupRecyclerView(@NonNull RecyclerView recyclerView, List<FlikrPhoto> photos) {
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(photos));
     }
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private final List<DummyContent.DummyItem> mValues;
+        private final List<FlikrPhoto> mValues;
 
-        public SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items) {
+        public SimpleItemRecyclerViewAdapter(List<FlikrPhoto> items) {
             mValues = items;
         }
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.picture_list_content, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.picture_list_content, parent, false);
             return new ViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mItem = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+            ImageLoader imageLoader = ImageLoader.getInstance();
+            imageLoader.displayImage(mValues.get(position).getURI(), holder.mImageView);
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mTwoPane) {
+                    /*if (mTwoPane) {
                         Bundle arguments = new Bundle();
                         arguments.putString(PictureDetailFragment.ARG_ITEM_ID, holder.mItem.id);
                         PictureDetailFragment fragment = new PictureDetailFragment();
@@ -111,7 +115,7 @@ public class PictureListActivity extends AppCompatActivity {
                         intent.putExtra(PictureDetailFragment.ARG_ITEM_ID, holder.mItem.id);
 
                         context.startActivity(intent);
-                    }
+                    }*/
                 }
             });
         }
@@ -123,20 +127,13 @@ public class PictureListActivity extends AppCompatActivity {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             public final View mView;
-            public final TextView mIdView;
-            public final TextView mContentView;
-            public DummyContent.DummyItem mItem;
+            public final ImageView mImageView;
+            public FlikrPhoto mItem;
 
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
-                mIdView = (TextView) view.findViewById(R.id.id);
-                mContentView = (TextView) view.findViewById(R.id.content);
-            }
-
-            @Override
-            public String toString() {
-                return super.toString() + " '" + mContentView.getText() + "'";
+                mImageView = (ImageView) view.findViewById(R.id.image);
             }
         }
     }
